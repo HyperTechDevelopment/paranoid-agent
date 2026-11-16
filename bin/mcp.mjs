@@ -5,7 +5,7 @@
 // Read-only, except render_breach_report with an explicit write_to path.
 // No network egress. Secrets never leave redacted.
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtempSync, statSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +16,7 @@ import { z } from "zod";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "..");
 const SCRIPTS = join(ROOT, "scripts");
+const VERSION = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version;
 const TIMEOUT_MS = 90000;
 const MAX_OUT = 1024 * 1024;
 
@@ -87,7 +88,7 @@ function textResult(obj) {
 }
 
 const server = new McpServer(
-  { name: "paranoid-agent", version: "1.1.0" },
+  { name: "paranoid-agent", version: VERSION },
   {
     instructions:
       "Paranoid security sweep primitives. Tools run local deterministic scans and return redacted JSON. They judge nothing: the agent traces data flow, scores, and writes the kill-list. prod/server targets are read-only; active probes are out of scope for these tools.",
