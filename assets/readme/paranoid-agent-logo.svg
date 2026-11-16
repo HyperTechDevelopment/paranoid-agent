@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="pahTitle pahDesc">
+<title id="pahTitle">Paranoid Agent — radar crosshair logo</title>
+<desc id="pahDesc">Radar de caça em verde neon sobre fundo escuro: três anéis concêntricos, varredura, mira e ponto central.</desc>
+<rect x="8" y="8" width="496" height="496" rx="96" fill="#070b11" stroke="#1c2635" stroke-width="4"/>
+<g fill="none" stroke="#00ff41" stroke-width="6" opacity="0.95">
+<circle cx="256" cy="232" r="120"/>
+<circle cx="256" cy="232" r="84" opacity="0.6"/>
+<circle cx="256" cy="232" r="48" opacity="0.35"/>
+</g>
+<path d="M256 232 L256 112 A120 120 0 0 1 340 148 Z" fill="#00ff41" opacity="0.22"/>
+<g stroke="#00ff41" stroke-width="6" stroke-linecap="round">
+<line x1="256" y1="88" x2="256" y2="116"/>
+<line x1="256" y1="348" x2="256" y2="376"/>
+<line x1="112" y1="232" x2="140" y2="232"/>
+<line x1="372" y1="232" x2="400" y2="232"/>
+</g>
+<g stroke="#ff4d5e" stroke-width="6" stroke-linecap="round">
+<line x1="216" y1="232" x2="296" y2="232"/>
+<line x1="256" y1="192" x2="256" y2="272"/>
+</g>
+<circle cx="256" cy="232" r="10" fill="#ff4d5e"/>
+<text x="256" y="440" text-anchor="middle" font-family="monospace" font-size="40" font-weight="bold" letter-spacing="8" fill="#d3deeb">PARANOID</text>
+<text x="256" y="474" text-anchor="middle" font-family="monospace" font-size="30" letter-spacing="14" fill="#00ff41">AGENT</text>
+</svg>
