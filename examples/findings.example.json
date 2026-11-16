@@ -1,0 +1,30 @@
+{
+  "env": "local/dev",
+  "target": "my-app",
+  "before": 42,
+  "after": 78,
+  "attacks": [
+    {"id": "A1", "target": "127.0.0.1:3000/admin", "payload": "X-Forwarded-For: 127.0.0.1", "expected": "401/403", "observed": "403 (dummy)", "verdict": "BLOCKED"},
+    {"id": "A2", "target": "/api/users/:id", "payload": "GET neighbor id (test account)", "expected": "403", "observed": "200 with dummy PII", "verdict": "OPEN"},
+    {"id": "A4", "target": "/webhook", "payload": "{\"url\":\"http://169.254.169.254/\"}", "expected": "422 no fetch", "observed": "422 blocked", "verdict": "BLOCKED"}
+  ],
+  "ports": [
+    {"host": "127.0.0.1", "port": 3000, "service": "nextjs", "auth": "none", "severity": "HIGH"},
+    {"host": "127.0.0.1", "port": 5432, "service": "postgres", "auth": "password", "severity": "LOW"}
+  ],
+  "leaks": [
+    {"commit": "a1b2c3d", "date": "2026-11-10", "file": "api/key.ts:12", "rule": "github-pat", "redacted": "ghp_***9f2c", "remote_reached": true}
+  ],
+  "kills": [
+    {"sev": "CRITICAL", "where": "api/key.ts:12", "impact": "hardcoded token with remote reach", "fix": "move to env + rotate + filter-repo"},
+    {"sev": "HIGH", "where": "/api/users/:id", "impact": "IDOR neighbor read", "fix": "if (row.owner_id !== session.user_id) return 403"}
+  ],
+  "scores": {
+    "secrets": [5, 18],
+    "exposure": [8, 16],
+    "auth": [10, 15],
+    "input": [12, 12],
+    "supply": [5, 7],
+    "hygiene": [2, 10]
+  }
+}
