@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Paranoid Agent — breach report com ataque simulado contido, score antes/depois e kill-list.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070b11'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2300ff41' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='11' fill='none' stroke='%2300ff41' stroke-width='3' opacity='.6'/%3E%3Cpath d='M32 32 L32 12 A20 20 0 0 1 46 18 Z' fill='%2300ff41' opacity='.3'/%3E%3Cline x1='32' y1='2' x2='32' y2='9' stroke='%2300ff41' stroke-width='3' stroke-linecap='round'/%3E%3Cline x1='32' y1='55' x2='32' y2='62' stroke='%2300ff41' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='4' fill='%23ff4d5e'/%3E%3C/svg%3E">
+<title>PARANOID AGENT — __BEFORE__ → __AFTER__</title>
+<style>
+:root{
+--bg:#070b11;--bg2:#0b1119;--panel:#0e141d;--panel2:#111927;--line:#1c2635;--line2:#263349;
+--txt:#d3deeb;--dim:#8b98ad;--faint:#5b6a80;
+--neon:#00ff41;--neon-dim:rgba(0,255,65,.14);
+--amber:#ffb454;--red:#ff4d5e;--cyan:#41e6ff;
+--radius:14px;--max:1160px;
+--ease:cubic-bezier(.22,.9,.24,1);
+--font:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,rgba(65,230,255,.06),transparent 60%),radial-gradient(900px 480px at 10% 0%,rgba(0,255,65,.07),transparent 55%),var(--bg);color:var(--txt);font-family:var(--font);-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:40;opacity:.5;
+background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,0,0,.16) 3px 4px)}
+::selection{background:var(--neon);color:#001105}
+a{color:var(--cyan)}
+.skip{position:absolute;left:-9999px;top:0;background:var(--neon);color:#001105;padding:10px 14px;z-index:100;font-weight:700}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+#bg3d{position:fixed;inset:0;z-index:0;opacity:.6}
+#loader{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;transition:opacity .45s var(--ease)}
+#loader.done{opacity:0;pointer-events:none}
+#loader .bar{width:220px;height:3px;background:var(--line);border-radius:99px;overflow:hidden}
+#loader .bar i{display:block;height:100%;width:30%;background:var(--neon);animation:scan 1s var(--ease) infinite alternate}
+@keyframes scan{to{transform:translateX(160px)}}
+.wrap{position:relative;z-index:2;max-width:var(--max);margin:0 auto;padding:20px 18px 72px}
+/* asymmetric hero: readout left, radar status right */
+.hero{display:grid;grid-template-columns:1.5fr .9fr;gap:16px;margin-top:14px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,rgba(17,25,39,.92),rgba(11,17,25,.92));border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 18px 60px rgba(0,0,0,.45)}
+.hero-main{overflow:hidden;position:relative}
+.hero-main::before{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,var(--neon),var(--cyan),transparent)}
+.kicker{font-size:11px;letter-spacing:3px;color:var(--dim);margin:0 0 6px}
+h1{margin:0;font-size:clamp(22px,3.4vw,34px);letter-spacing:1px;line-height:1.05;color:#fff}
+h1 .neon{color:var(--neon);text-shadow:0 0 18px rgba(0,255,65,.55)}
+.sub{color:var(--dim);font-size:13px;margin-top:8px;max-width:60ch}
+.envrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border:1px solid var(--neon);border-radius:999px;font-size:12px;color:var(--neon)}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.meta{font-size:12px;color:var(--dim)}
+/* score duel: signature moment */
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end;margin-top:18px}
+.duel .num{font-size:clamp(34px,5vw,54px);font-weight:700;line-height:1;color:#fff}
+.duel .num small{display:block;font-size:11px;letter-spacing:2px;color:var(--dim);font-weight:400}
+#before{color:#ff8b96}#after{color:var(--neon);text-shadow:0 0 16px rgba(0,255,65,.4)}
+.duel .arrow{font-size:28px;color:var(--cyan);padding-bottom:22px}
+.duelbars{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.duelbars .track{height:10px;background:#05080d;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.duelbars .fill{display:block;height:100%;width:0;transition:width 1s var(--ease)}
+#fillBefore{background:linear-gradient(90deg,#7a2430,var(--red))}
+#fillAfter{background:linear-gradient(90deg,#0a5a22,var(--neon))}
+.delta{color:var(--cyan);font-size:13px;margin-top:8px}
+/* radar side */
+.radar-side{display:flex;flex-direction:column;gap:12px}
+.status{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.status div{border:1px solid var(--line);border-radius:10px;padding:10px 6px;background:#0a0f16}
+.status b{font-size:20px;display:block}
+.status span{font-size:10px;letter-spacing:1.5px;color:var(--dim)}
+.legend{font-size:12px;color:var(--dim);line-height:1.7}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+/* nav */
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+nav.toc a{font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:6px 12px;text-decoration:none;background:rgba(14,20,29,.7)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--neon);border-color:var(--neon)}
+/* sections with reveal */
+section{margin-top:16px;opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+section.in{opacity:1;transform:none}
+h2{font-size:12px;letter-spacing:2.5px;color:var(--cyan);margin:0 0 4px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.desc{font-size:12px;color:var(--dim);margin:0 0 12px}
+/* tables that become cards on mobile */
+table{width:100%;border-collapse:collapse;font-size:13px}
+caption{text-align:left;font-size:12px;color:var(--dim);padding-bottom:8px}
+th,td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+th{color:var(--dim);font-weight:400;font-size:11px;letter-spacing:1.5px;text-transform:uppercase}
+tr:hover td{background:rgba(65,230,255,.03)}
+.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:11px;border:1px solid;letter-spacing:1px;white-space:nowrap}
+.open{color:#ffb3bb;border-color:var(--red);background:rgba(255,77,94,.1);box-shadow:0 0 12px rgba(255,77,94,.25)}
+.blocked{color:var(--neon);border-color:var(--neon);background:var(--neon-dim)}
+.skipped{color:var(--amber);border-color:var(--amber);background:rgba(255,180,84,.1)}
+code{background:#020507;border:1px solid var(--line);padding:2px 7px;border-radius:6px;color:var(--neon);font-size:12px}
+pre{background:#020507;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:12px;color:var(--neon);line-height:1.6}
+/* ports: severity rail, not 3 equal cards */
+.ports{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.port{position:relative;border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 18px;background:#0a0f16;transition:transform .25s var(--ease),border-color .25s var(--ease)}
+.port:hover{transform:translateY(-3px)}
+.port::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:4px;border-radius:99px;background:var(--faint)}
+.port.crit::before{background:var(--red);box-shadow:0 0 12px var(--red)}
+.port.high::before{background:var(--amber);box-shadow:0 0 10px rgba(255,180,84,.6)}
+.port.low::before{background:var(--neon)}
+.port b{font-size:14px}
+.port .svc{color:var(--dim);font-size:12px;margin-top:4px;display:block}
+/* kills: numbered rail ordered grave→leve */
+.kill{border:1px solid var(--line);border-radius:12px;padding:14px 14px 14px 58px;position:relative;background:#0a0f16;margin-top:10px}
+.kill .n{position:absolute;left:12px;top:14px;width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;background:#05080d;border:1px solid var(--line2)}
+.kill.critical .n{color:#ffb3bb;border-color:var(--red)}
+.kill.high .n{color:var(--amber);border-color:var(--amber)}
+.kill.medium .n,.kill.low .n{color:var(--neon);border-color:var(--neon)}
+.kill h3{margin:0 0 6px;font-size:13px}
+.kill p{margin:0 0 8px;color:var(--dim);font-size:12.5px}
+#bars{width:100%;height:320px;display:block}
+#timeline{min-height:70px;white-space:pre-wrap;color:var(--neon);font-size:13px;line-height:1.7}
+.empty{border:1px dashed var(--line2);border-radius:10px;padding:14px;color:var(--dim);font-size:13px}
+footer{color:var(--dim);font-size:12px;margin-top:18px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.blink{animation:blink 1.1s steps(2) infinite}@keyframes blink{50%{opacity:0}}
+@media(max-width:760px){
+table thead{display:none}
+table tr{display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:6px 10px;background:#0a0f16}
+table td{display:block;border:0;padding:6px 0}
+table td::before{content:attr(data-l);display:block;font-size:10px;letter-spacing:2px;color:var(--faint);text-transform:uppercase}
+#bars{height:280px}
+.duel{grid-template-columns:1fr auto 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+*{animation:none!important;transition:none!important}
+section{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Pular para o relatório</a>
+<div id="loader" role="status" aria-label="Carregando relatório"><div style="color:var(--neon);letter-spacing:3px;font-size:12px">PARANOID AGENT</div><div class="bar"><i></i></div><div style="color:var(--dim);font-size:12px">montando radar…</div></div>
+<canvas id="bg3d" aria-hidden="true"></canvas>
+<div class="wrap">
+<header class="panel hero-main">
+<p class="kicker">BREACH REPORT · ATAQUE SIMULADO → SOLUÇÃO</p>
+<h1>▓ PARANOID <span class="neon">AGENT</span></h1>
+<p class="sub">Ataque simulado para avaliar e medir a segurança deste projeto. Nenhum dado real é tocado ou exfiltrado. Cada falha encontrada vira solução na kill-list.</p>
+<div class="envrow"><span class="badge" id="env"><i></i>ENV</span><span class="meta">target <b id="target">—</b> · <span id="date"></span> <span class="blink">█</span></span></div>
+<div class="duel" aria-live="polite">
+<div><div class="num"><span id="before">__BEFORE__</span><small>ANTES /100</small></div></div>
+<div class="arrow" aria-hidden="true">→</div>
+<div><div class="num"><span id="after">__AFTER__</span><small>DEPOIS /100</small></div></div>
+</div>
+<div class="duelbars" aria-hidden="true"><div class="track"><span class="fill" id="fillBefore"></span></div><div class="track"><span class="fill" id="fillAfter"></span></div></div>
+<div class="delta" id="delta"></div>
+</header>
+
+<div class="hero">
+<div class="panel radar-side">
+<div class="status"><div><b id="cOpen" style="color:var(--red)">0</b><span>OPEN</span></div><div><b id="cBlocked" style="color:var(--neon)">0</b><span>BLOCKED</span></div><div><b id="cPorts" style="color:var(--cyan)">0</b><span>PORTAS</span></div></div>
+<p class="legend"><span class="dot" style="background:var(--red)"></span>porta crítica / ataque OPEN<br><span class="dot" style="background:var(--neon)"></span>bloqueado / resolvido<br><span class="dot" style="background:var(--amber)"></span>ignorado em prod (read-only)</p>
+</div>
+<div class="panel">
+<h2>RADAR 3D</h2>
+<p class="desc">Rede de nós por porta. Vermelho indica severidade alta. Mova o mouse para parallax. Em mobile ou sem WebGL, o relatório usa a versão 2D.</p>
+<p class="desc">Performance: pixel-ratio limitado, partículas reduzidas em mobile, pausa fora da aba e sob <code>prefers-reduced-motion</code>.</p>
+</div>
+</div>
+
+<nav class="toc" aria-label="Seções">
+<a href="#s-do">01 o que foi feito</a><a href="#s-atk">02 ataques × esperado</a><a href="#s-chart">03 antes vs depois</a><a href="#s-ports">04 portas</a><a href="#s-leaks">05 segredos</a><a href="#s-kill">06 kill-list</a>
+</nav>
+
+<main id="main">
+<section class="panel" id="s-do"><h2>01 — O QUE FOI FEITO</h2><p class="desc">Timeline auditável com ambiente, commits, arquivos e vetores.</p><div id="timeline"></div></section>
+
+<section class="panel" id="s-atk"><h2>02 — ATAQUES SIMULADOS × RESULTADO ESPERADO</h2><p class="desc">Cada OPEN vira item da kill-list. Payloads sempre dummy, só loopback em <code>local/dev</code>.</p>
+<table id="attacks"><caption>Ataques contidos e vereditos</caption><tr><th scope="col">ID</th><th scope="col">Alvo</th><th scope="col">Payload dummy</th><th scope="col">Esperado</th><th scope="col">Observado</th><th scope="col">Veredito</th></tr></table></section>
+
+<section class="panel" id="s-chart"><h2>03 — ANTES vs DEPOIS</h2><p class="desc">Barras animadas por dimensão do scorecard (vermelho = antes, verde = depois projetado).</p><canvas id="bars" role="img" aria-label="Gráfico de barras comparando segurança antes e depois por dimensão"></canvas></section>
+
+<section class="panel" id="s-ports"><h2>04 — PORTAS IDENTIFICADAS</h2><p class="desc">Inventário local (sem scan externo). <code>0.0.0.0</code> sem auth em prod = CRITICAL.</p><div class="ports" id="ports"></div></section>
+
+<section class="panel" id="s-leaks"><h2>05 — COMMITS COM SEGREDOS (REDATADO)</h2><p class="desc">Padrão gitleaks. O valor nunca aparece, só prefixo e sufixo. Se o remoto foi alcançado, trate como COMPROMISED e rotacione primeiro.</p>
+<table id="leaks"><caption>Segredos encontrados (redatados)</caption><tr><th scope="col">Commit</th><th scope="col">Arquivo:linha</th><th scope="col">Regra</th><th scope="col">Match</th><th scope="col">Status</th></tr></table></section>
+
+<section class="panel" id="s-kill"><h2>06 — KILL-LIST · GRAVE → LEVE</h2><p class="desc">Cada ataque vira uma solução com evidência, impacto em uma frase e patch mínimo.</p><div id="kills"></div></section>
+</main>
+
+<footer><span>read-only em prod · segredos redatados · pare no primeiro byte</span><span>single-file · three.js CDN com fallback 2D</span></footer>
+</div>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+var FINDINGS = /*__FINDINGS__*/{};
+var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('env').innerHTML = '<i></i>ENV: ' + (FINDINGS.env || '?');
+document.getElementById('target').textContent = FINDINGS.target || '?';
+document.getElementById('date').textContent = new Date().toLocaleString();
+var b = FINDINGS.before||0, a = FINDINGS.after||0, d = a-b;
+document.getElementById('delta').textContent = 'evolução projetada: +' + d + ' pts após aplicar a kill-list';
+requestAnimationFrame(function(){document.getElementById('fillBefore').style.width=(b+'%');document.getElementById('fillAfter').style.width=(a+'%');});
+// count-up (one clock)
+(function(){if(reduced){document.getElementById('before').textContent=b;document.getElementById('after').textContent=a;return;}
+var t0=null;function step(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/900);
+document.getElementById('before').textContent=Math.round(b+(0)*p);
+document.getElementById('after').textContent=Math.round(b+d*p);
+if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);})();
+// counters
+var atk=FINDINGS.attacks||[],ports=FINDINGS.ports||[];
+var open=atk.filter(function(x){return (x.verdict||'').toUpperCase()==='OPEN';}).length;
+var blocked=atk.filter(function(x){return (x.verdict||'').toUpperCase()==='BLOCKED';}).length;
+document.getElementById('cOpen').textContent=open;
+document.getElementById('cBlocked').textContent=blocked;
+document.getElementById('cPorts').textContent=ports.length;
+// timeline typing
+(function(){var lines=['> env gate: '+(FINDINGS.env||'?'),
+'> commits varridos: 10','> arquivos: worktree + diff + CI/logs',
+'> portas inventariadas: '+ports.length,
+'> ataques: '+atk.length+' vetores contidos (dummy, loopback)',
+'> score: '+b+' -> '+a+' — ataques viram soluções'];
+var el=document.getElementById('timeline');var full=lines.join('\n');
+if(reduced){el.textContent=full;return;}
+var i=0;var iv=setInterval(function(){el.textContent=full.slice(0,++i);if(i>=full.length)clearInterval(iv);},10);})();
+// attacks table with data-labels for mobile cards
+(function(){var t=document.getElementById('attacks');
+if(!atk.length){t.insertAdjacentHTML('beforeend','<tr><td colspan="6"><div class="empty">Nenhum vetor executado (ex.: prod read-only).</div></td></tr>');return;}
+atk.forEach(function(x){var v=(x.verdict||'').toUpperCase();
+var cls=v==='OPEN'?'open':(v.indexOf('SKIP')===0?'skipped':'blocked');
+t.insertAdjacentHTML('beforeend','<tr><td data-l="ID"><code>'+x.id+'</code></td><td data-l="Alvo">'+x.target+'</td><td data-l="Payload"><code>'+x.payload+'</code></td><td data-l="Esperado">'+x.expected+'</td><td data-l="Observado">'+x.observed+'</td><td data-l="Veredito"><span class="pill '+cls+'">'+x.verdict+'</span></td></tr>');});})();
+// ports
+(function(){var g=document.getElementById('ports');
+if(!ports.length){g.innerHTML='<div class="empty">Nenhuma porta inventariada.</div>';return;}
+ports.forEach(function(p){var s=(p.severity||'LOW');var sl=s.toLowerCase();
+var cls=sl==='critical'?'crit':(sl==='high'?'high':'low');
+g.insertAdjacentHTML('beforeend','<div class="port '+cls+'"><b>'+p.host+':'+p.port+'</b><span class="svc">'+(p.service||'?')+' · auth: '+(p.auth||'?')+'</span><br><span class="pill '+(sl==='critical'?'open':'blocked')+'">'+s+'</span></div>');});})();
+// leaks
+(function(){var t=document.getElementById('leaks');var leaks=FINDINGS.leaks||[];
+if(!leaks.length){t.insertAdjacentHTML('beforeend','<tr><td colspan="5"><div class="empty">Nenhum segredo detectado nos últimos 10 commits.</div></td></tr>');return;}
+leaks.forEach(function(l){t.insertAdjacentHTML('beforeend','<tr><td data-l="Commit"><code>'+l.commit+'</code><br>'+(l.date||'')+'</td><td data-l="Arquivo">'+l.file+'</td><td data-l="Regra"><code>'+l.rule+'</code></td><td data-l="Match"><code>'+l.redacted+'</code></td><td data-l="Status">'+(l.remote_reached?'COMPROMISED. Rotacione primeiro.':'somente local')+'</td></tr>');});})();
+// kills
+(function(){var box=document.getElementById('kills');var kills=FINDINGS.kills||[];
+if(!kills.length){box.innerHTML='<div class="empty">Nada a matar. Higiene mantida.</div>';return;}
+kills.forEach(function(k,i){var sev=(k.sev||'LOW');var cls=sev.toLowerCase();
+box.insertAdjacentHTML('beforeend','<div class="kill '+cls+'"><span class="n">'+(i+1)+'</span><h3>['+sev+'] '+k.where+'</h3><p>'+k.impact+'</p><pre>'+k.fix+'</pre></div>');});})();
+// chart: grouped bars + values (single rAF clock)
+(function(){var c=document.getElementById('bars');var ctx=c.getContext('2d');
+function draw(p){var r=c.getBoundingClientRect();var W=Math.max(280,r.width),H=320;
+c.width=W*2;c.height=H*2;ctx.setTransform(2,0,0,2,0,0);ctx.clearRect(0,0,W,H);
+var dims=[['secrets',FINDINGS.scores&&FINDINGS.scores.secrets],['exposure',FINDINGS.scores&&FINDINGS.scores.exposure],['auth',FINDINGS.scores&&FINDINGS.scores.auth],['input',FINDINGS.scores&&FINDINGS.scores.input],['supply',FINDINGS.scores&&FINDINGS.scores.supply],['hygiene',FINDINGS.scores&&FINDINGS.scores.hygiene]];
+var bw=Math.min(40,(W/dims.length)/3.2);
+dims.forEach(function(dd,i){if(!dd[1])return;var x=24+i*(W-48)/dims.length;
+var hb=(dd[1][0]/20)*200*p,ha=(dd[1][1]/20)*200*p;
+ctx.fillStyle='#ff4d5e';ctx.fillRect(x,H-46-hb,bw,hb);
+ctx.fillStyle='#00ff41';ctx.fillRect(x+bw+7,H-46-ha,bw,ha);
+ctx.fillStyle='#d3deeb';ctx.font='11px monospace';
+ctx.fillText(dd[1][0],x,H-46-Math.max(hb,12)-4);ctx.fillText(dd[1][1],x+bw+7,H-46-Math.max(ha,12)-4);
+ctx.fillStyle='#8b98ad';ctx.font='11px monospace';ctx.fillText(dd[0],x,H-24);});
+ctx.fillStyle='#8b98ad';ctx.font='11px monospace';ctx.fillText('■ antes (vermelho)  ■ depois (verde)',24,18);}
+if(reduced){draw(1);}else{var t0=null;function an(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/850);draw(p);if(p<1)requestAnimationFrame(an);}requestAnimationFrame(an);}
+var rT;addEventListener('resize',function(){clearTimeout(rT);rT=setTimeout(function(){draw(1);},150);});})();
+// reveal on scroll
+(function(){var secs=document.querySelectorAll('section');
+if(!('IntersectionObserver' in window)||reduced){secs.forEach(function(s){s.classList.add('in');});return;}
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.08});
+secs.forEach(function(s){io.observe(s);});})();
+// three.js: severity node network, pointer parallax, perf guards
+(function(){var cv=document.getElementById('bg3d');
+function fallback(){cv.style.display='none';}
+try{
+if(reduced||typeof THREE==='undefined')return fallback();
+var isMobile=matchMedia('(max-width: 760px)').matches;
+var renderer;try{renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:!isMobile,powerPreference:'low-power'});}catch(e){return fallback();}
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,isMobile?1.25:1.75));
+renderer.setSize(innerWidth,innerHeight);
+var scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x070b11,.028);
+var cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,120);cam.position.set(0,1.5,15);
+var N=isMobile?26:Math.min(90,26+ports.length*8);
+var pos=new Float32Array(N*3),col=new Float32Array(N*3);
+var cGreen=new THREE.Color(0x00ff41),cRed=new THREE.Color(0xff4d5e),cCyan=new THREE.Color(0x41e6ff);
+for(var i=0;i<N;i++){pos[i*3]=(Math.random()-.5)*24;pos[i*3+1]=(Math.random()-.5)*13;pos[i*3+2]=(Math.random()-.5)*9;
+var crit=ports.length&&i<ports.length*2;var c=crit?(i%3===0?cRed:cCyan):cGreen;
+col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;}
+var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
+scene.add(new THREE.Points(g,new THREE.PointsMaterial({size:.14,vertexColors:true,transparent:true,opacity:.9})));
+// faint links
+var lg=new THREE.BufferGeometry();var lp=[];
+for(var j=0;j<N-1;j+=2){lp.push(pos[j*3],pos[j*3+1],pos[j*3+2],pos[(j+1)*3],pos[(j+1)*3+1],pos[(j+1)*3+2]);}
+lg.setAttribute('position',new THREE.Float32BufferAttribute(lp,3));
+scene.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x1c2635,transparent:true,opacity:.55})));
+var mx=0,my=0;addEventListener('pointermove',function(e){mx=(e.clientX/innerWidth-.5);my=(e.clientY/innerHeight-.5);},{passive:true});
+var run=true;document.addEventListener('visibilitychange',function(){run=!document.hidden;if(run)requestAnimationFrame(loop);});
+var sy=0;addEventListener('scroll',function(){sy=scrollY;},{passive:true});
+(function loop(){if(!run)return;requestAnimationFrame(loop);
+scene.rotation.y+=.0011+mx*.002;scene.rotation.x+=.0003+my*.0012;
+cam.position.y=1.5-sy*.0012;cam.lookAt(0,0,0);
+renderer.render(scene,cam);})();
+addEventListener('resize',function(){renderer.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();});
+}catch(e){fallback();}})();
+// loader out
+addEventListener('load',function(){setTimeout(function(){document.getElementById('loader').classList.add('done');},reduced?0:450);});
+setTimeout(function(){document.getElementById('loader').classList.add('done');},2600);
+})();
+</script>
+</body>
+</html>
