@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# npm pack output
+*.tgz
+
+# generated reports and findings from real runs
+breach-report.html
+findings.json
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# local env and secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*

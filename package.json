@@ -1,0 +1,48 @@
+{
+  "name": "paranoid-agent-skill",
+  "version": "1.1.0",
+  "description": "Paranoid Agent — standalone paranoid security sweep skill: 10-commit forensics, secret hunt, contained self-attack, before/after score, animated 3D HTML report.",
+  "keywords": [
+    "agent-skill",
+    "security",
+    "paranoid",
+    "pentest",
+    "gitleaks",
+    "red-team",
+    "opencode",
+    "claude",
+    "codex"
+  ],
+  "license": "MIT",
+  "author": "Marcos Gabriel (HyperTechDevelopment) — https://github.com/HyperTechDevelopment",
+  "type": "module",
+  "bin": {
+    "paranoid-agent-skill": "bin/cli.mjs"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "README.en.md",
+    "INSTALL_SKILL.md",
+    "INSTALL_MCP.md",
+    "assets/**/*",
+    "examples/**/*",
+    "references/**/*",
+    "scripts/**/*",
+    "bin/cli.mjs",
+    "bin/install.mjs",
+    "bin/mcp.mjs"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HyperTechDevelopment/paranoid-agent.git"
+  },
+  "homepage": "https://github.com/HyperTechDevelopment/paranoid-agent#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  }
+}
