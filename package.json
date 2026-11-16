@@ -1,6 +1,6 @@
 {
   "name": "paranoid-agent-skill",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Paranoid Agent — standalone paranoid security sweep skill: 10-commit forensics, secret hunt, contained self-attack, before/after score, animated 3D HTML report.",
   "keywords": [
     "agent-skill",
