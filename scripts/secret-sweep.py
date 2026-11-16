@@ -89,7 +89,8 @@ def scan_history(root, out):
     try:
         r = subprocess.run(["git", "-C", root, "log", "-n", "10", "--patch", "--no-merges",
                             "-U0", "--", ".", ":(exclude)package-lock.json"],
-                           capture_output=True, text=True, timeout=30)
+                           capture_output=True, text=True, encoding="utf-8", errors="replace",
+                           timeout=30)
     except Exception:
         return
     if r.returncode != 0:

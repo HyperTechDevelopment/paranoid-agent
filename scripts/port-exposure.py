@@ -9,7 +9,8 @@ def os_listeners():
         if not exe:
             continue
         try:
-            r = subprocess.run([exe] + cmd[1:], capture_output=True, text=True, timeout=10)
+            r = subprocess.run([exe] + cmd[1:], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=10)
         except Exception:
             continue
         if r.returncode != 0 or not r.stdout.strip():
